@@ -10,6 +10,7 @@ import {
 import { AppService } from '../services/app.service';
 import type { Artist } from '../types/ArtistType';
 import type { Album } from '../types/AlbumType';
+import { Types } from 'mongoose';
 
 @Controller()
 export class AppController {
@@ -21,13 +22,13 @@ export class AppController {
   }
 
   @Get('artists/:id')
-  getArtistById(@Param() id: string): Promise<Artist[]> {
+  getArtistById(@Param() id: Types.ObjectId): Promise<Artist[]> {
     return this.appService.getArtistById(id);
   }
 
   @Get('artists/:artistId/albums/:albumTitle')
   getArtistsAlbum(
-    @Param() artistId: string,
+    @Param() artistId: Types.ObjectId,
     @Param() albumTitle: string,
   ): Promise<Album | []> {
     return this.appService.getArtistsAlbum(artistId, albumTitle);
@@ -44,12 +45,15 @@ export class AppController {
   }
 
   @Delete('/artists/:id')
-  deleteArtist(@Param() id: string): Promise<object> {
+  deleteArtist(@Param() id: Types.ObjectId): Promise<object> {
     return this.appService.deleteArtist(id);
   }
 
   @Put('/artists/:id')
-  updateArtist(@Param() id: string, @Body() request: Artist): Promise<object> {
+  updateArtist(
+    @Param() id: Types.ObjectId,
+    @Body() request: Artist,
+  ): Promise<object> {
     return this.appService.updateArtist(id, request);
   }
 }
