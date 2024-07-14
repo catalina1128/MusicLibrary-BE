@@ -3,17 +3,17 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Artist } from '../models/artist';
 import { Album } from '../types/AlbumType';
-import type { Artist as ArtistType } from '../types/ArtistType';
+import { Types } from 'mongoose';
 import mongoose from 'mongoose';
 
 @Injectable()
 export class AppService {
   constructor(@InjectModel(Artist.name) private artistModel: Model<Artist>) {}
-  getArtists(): Promise<ArtistType[]> {
+  getArtists(): Promise<Artist[]> {
     return this.artistModel.find().exec();
   }
 
-  getArtistById(id: string): Promise<ArtistType[]> {
+  getArtistById(id: Types.ObjectId): Promise<Artist[]> {
     const query = {
       _id: id,
     };
@@ -22,7 +22,7 @@ export class AppService {
   }
 
   async getArtistsAlbum(
-    artistId: string,
+    artistId: Types.ObjectId,
     albumTitle: string,
   ): Promise<Album | []> {
     const query = {
@@ -42,7 +42,7 @@ export class AppService {
     return album ?? [];
   }
 
-  async getArtistsSuggestions(name: string): Promise<ArtistType[]> {
+  async getArtistsSuggestions(name: string): Promise<Artist[]> {
     const query = {
       name: { $regex: name, $options: 'i' },
     };
@@ -50,7 +50,7 @@ export class AppService {
     return this.artistModel.find(query).exec();
   }
 
-  async addArtist(request: ArtistType): Promise<object> {
+  async addArtist(request: Artist): Promise<object> {
     const artist = await this.artistModel.create(request);
 
     if (!artist) {
@@ -64,7 +64,7 @@ export class AppService {
     };
   }
 
-  async deleteArtist(id: string): Promise<object> {
+  async deleteArtist(id: Types.ObjectId): Promise<object> {
     const query = {
       _id: id,
     };
@@ -82,7 +82,7 @@ export class AppService {
     };
   }
 
-  async updateArtist(id: string, request: ArtistType): Promise<object> {
+  async updateArtist(id: Types.ObjectId, request: Artist): Promise<object> {
     const query = {
       _id: id,
     };

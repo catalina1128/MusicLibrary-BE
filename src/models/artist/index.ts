@@ -1,14 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import { Album } from '../album';
-import { ObjectId } from 'mongoose';
+import { Types } from 'mongoose';
 
 export type ArtistDocument = HydratedDocument<Artist>;
 
 @Schema()
 export class Artist {
   @Prop()
-  _id: ObjectId;
+  _id: Types.ObjectId;
 
   @Prop()
   name: string;
