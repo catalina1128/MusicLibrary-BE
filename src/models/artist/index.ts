@@ -8,7 +8,7 @@ export type ArtistDocument = HydratedDocument<Artist>;
 @Schema()
 export class Artist {
   @Prop()
-  id: ObjectId;
+  _id: ObjectId;
 
   @Prop()
   name: string;
