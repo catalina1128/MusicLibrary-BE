@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Artist } from '../models/artist';
 import { Album } from '../types/AlbumType';
-import { Types } from 'mongoose';
 import mongoose from 'mongoose';
 
 @Injectable()
@@ -13,23 +12,15 @@ export class AppService {
     return this.artistModel.find().exec();
   }
 
-  getArtistById(id: Types.ObjectId): Promise<Artist[]> {
-    const query = {
-      _id: id,
-    };
-
-    return this.artistModel.find(query).limit(1).exec();
+  getArtistById(id: string): Promise<Artist | null> {
+    return this.artistModel.findById(id).exec();
   }
 
   async getArtistsAlbum(
-    artistId: Types.ObjectId,
+    artistId: string,
     albumTitle: string,
   ): Promise<Album | []> {
-    const query = {
-      _id: new mongoose.Types.ObjectId(artistId),
-    };
-
-    const artist = await this.artistModel.findOne(query).exec();
+    const artist = await this.artistModel.findById(artistId).exec();
 
     if (!artist) {
       return [];
@@ -64,13 +55,11 @@ export class AppService {
     };
   }
 
-  async deleteArtist(id: Types.ObjectId): Promise<object> {
-    const query = {
-      _id: id,
-    };
-    const response = await this.artistModel.find(query).deleteOne(query).exec();
+  async deleteArtist(id: string): Promise<object> {
+    const artistId = new mongoose.Types.ObjectId(id);
+    const response = await this.artistModel.findByIdAndDelete(artistId).exec();
 
-    if (response.deletedCount === 0) {
+    if (!response) {
       return {
         success: false,
       };
@@ -82,12 +71,8 @@ export class AppService {
     };
   }
 
-  async updateArtist(id: Types.ObjectId, request: Artist): Promise<object> {
-    const query = {
-      _id: id,
-    };
-
-    const artist = await this.artistModel.find(query).updateOne(request).exec();
+  async updateArtist(id: string, request: Artist): Promise<object> {
+    const artist = await this.artistModel.findByIdAndUpdate(id, request).exec();
 
     if (!artist) {
       return {
