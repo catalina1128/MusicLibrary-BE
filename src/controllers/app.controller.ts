@@ -21,20 +21,20 @@ export class AppController {
   }
 
   @Get('artists/:id')
-  getArtistById(@Param('id') id: string): Promise<Artist[]> {
+  getArtistById(@Param() id: string): Promise<Artist[]> {
     return this.appService.getArtistById(id);
   }
 
   @Get('artists/:artistId/albums/:albumTitle')
   getArtistsAlbum(
-    @Param('artistId') artistId: string,
-    @Param('albumTitle') albumTitle: string,
+    @Param() artistId: string,
+    @Param() albumTitle: string,
   ): Promise<Album | []> {
     return this.appService.getArtistsAlbum(artistId, albumTitle);
   }
 
   @Get('artists/:name/suggestions')
-  getArtistsSuggestions(@Param('name') name: string): Promise<Artist[]> {
+  getArtistsSuggestions(@Param() name: string): Promise<Artist[]> {
     return this.appService.getArtistsSuggestions(name);
   }
 
@@ -44,15 +44,12 @@ export class AppController {
   }
 
   @Delete('/artists/:id')
-  deleteArtist(@Param('id') id: string): Promise<object> {
+  deleteArtist(@Param() id: string): Promise<object> {
     return this.appService.deleteArtist(id);
   }
 
   @Put('/artists/:id')
-  updateArtist(
-    @Param('id') id: string,
-    @Body() request: Artist,
-  ): Promise<object> {
+  updateArtist(@Param() id: string, @Body() request: Artist): Promise<object> {
     return this.appService.updateArtist(id, request);
   }
 }
