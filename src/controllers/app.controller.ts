@@ -29,7 +29,7 @@ export class AppController {
   getArtistsAlbum(
     @Param('artistId') artistId: string,
     @Param('albumTitle') albumTitle: string,
-  ): Promise<Album> {
+  ): Promise<Album | []> {
     return this.appService.getArtistsAlbum(artistId, albumTitle);
   }
 

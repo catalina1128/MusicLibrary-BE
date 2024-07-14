@@ -1,7 +1,8 @@
 import type { Album } from './AlbumType.js';
+import { Types } from 'mongoose';
 
 export type Artist = {
-  id: number;
+  _id: Types.ObjectId;
   name: string;
   albums: Album[];
 };

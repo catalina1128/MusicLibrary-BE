@@ -2,17 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Artist } from '../models/artist';
-import { Album } from '../models/album';
+import { Album } from '../types/AlbumType';
+import type { Artist as ArtistType } from '../types/ArtistType';
 import mongoose from 'mongoose';
 
 @Injectable()
 export class AppService {
   constructor(@InjectModel(Artist.name) private artistModel: Model<Artist>) {}
-  getArtists(): Promise<Artist[]> {
+  getArtists(): Promise<ArtistType[]> {
     return this.artistModel.find().exec();
   }
 
-  getArtistById(id: string): Promise<Artist[]> {
+  getArtistById(id: string): Promise<ArtistType[]> {
     const query = {
       _id: id,
     };
@@ -20,7 +21,10 @@ export class AppService {
     return this.artistModel.find(query).limit(1).exec();
   }
 
-  async getArtistsAlbum(artistId: string, albumTitle: string): Promise<Album> {
+  async getArtistsAlbum(
+    artistId: string,
+    albumTitle: string,
+  ): Promise<Album | []> {
     const query = {
       _id: new mongoose.Types.ObjectId(artistId),
     };
@@ -28,17 +32,17 @@ export class AppService {
     const artist = await this.artistModel.findOne(query).exec();
 
     if (!artist) {
-      return new Album();
+      return [];
     }
 
     const album = artist.albums.find(
       (album: Album) => album.title === albumTitle,
     );
 
-    return album ?? new Album();
+    return album ?? [];
   }
 
-  async getArtistsSuggestions(name: string): Promise<Artist[]> {
+  async getArtistsSuggestions(name: string): Promise<ArtistType[]> {
     const query = {
       name: { $regex: name, $options: 'i' },
     };
@@ -46,7 +50,7 @@ export class AppService {
     return this.artistModel.find(query).exec();
   }
 
-  async addArtist(request: Artist): Promise<object> {
+  async addArtist(request: ArtistType): Promise<object> {
     const artist = await this.artistModel.create(request);
 
     if (!artist) {
@@ -78,7 +82,7 @@ export class AppService {
     };
   }
 
-  async updateArtist(id: string, request: Artist): Promise<object> {
+  async updateArtist(id: string, request: ArtistType): Promise<object> {
     const query = {
       _id: id,
     };
