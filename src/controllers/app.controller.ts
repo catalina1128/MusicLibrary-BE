@@ -16,12 +16,12 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get('artists')
-  getArtists(): Promise<Artist[]> {
+  getArtists(): Promise<object> {
     return this.appService.getArtists();
   }
 
   @Get('artists/:id')
-  getArtistById(@Param('id') id: string): Promise<Artist | null> {
+  getArtistById(@Param('id') id: string): object {
     return this.appService.getArtistById(id);
   }
 
@@ -29,12 +29,12 @@ export class AppController {
   getArtistsAlbum(
     @Param('artistId') artistId: string,
     @Param('albumTitle') albumTitle: string,
-  ): Promise<Album | []> {
+  ): Promise<object> {
     return this.appService.getArtistsAlbum(artistId, albumTitle);
   }
 
   @Get('artists/:name/suggestions')
-  getArtistsSuggestions(@Param('name') name: string): Promise<Artist[]> {
+  getArtistsSuggestions(@Param('name') name: string): Promise<object> {
     return this.appService.getArtistsSuggestions(name);
   }
 

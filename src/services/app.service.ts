@@ -8,41 +8,118 @@ import mongoose from 'mongoose';
 @Injectable()
 export class AppService {
   constructor(@InjectModel(Artist.name) private artistModel: Model<Artist>) {}
-  getArtists(): Promise<Artist[]> {
-    return this.artistModel.find().exec();
-  }
+  async getArtists(): Promise<object> {
+    let artists = [];
 
-  getArtistById(id: string): Promise<Artist | null> {
-    return this.artistModel.findById(id).exec();
-  }
-
-  async getArtistsAlbum(
-    artistId: string,
-    albumTitle: string,
-  ): Promise<Album | []> {
-    const artist = await this.artistModel.findById(artistId).exec();
-
-    if (!artist) {
-      return [];
+    try {
+      artists = await this.artistModel.find().exec();
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Error fetching artists',
+      };
     }
 
-    const album = artist.albums.find(
-      (album: Album) => album.title === albumTitle,
-    );
-
-    return album ?? [];
+    return {
+      success: true,
+      data: artists,
+    };
   }
 
-  async getArtistsSuggestions(name: string): Promise<Artist[]> {
+  async getArtistById(id: string): Promise<object> {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return {
+        success: false,
+        error: 'Invalid ID',
+      };
+    }
+
+    let artist = null;
+
+    try {
+      const artistId = new mongoose.Types.ObjectId(id);
+      artist = await this.artistModel.findById(artistId).exec();
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Error fetching artist',
+      };
+    }
+
+    return {
+      success: true,
+      data: artist,
+    };
+  }
+
+  async getArtistsAlbum(artistId: string, albumTitle: string): Promise<object> {
+    if (!mongoose.Types.ObjectId.isValid(artistId)) {
+      return {
+        success: false,
+        error: 'Invalid ID',
+      };
+    }
+
+    let album = null;
+
+    try {
+      const id = new mongoose.Types.ObjectId(artistId);
+      const artist = await this.artistModel.findById(id).exec();
+
+      if (!artist) {
+        return {
+          success: false,
+          error: 'Artist not found',
+        };
+      }
+
+      album = artist.albums.find((album: Album) => album.title === albumTitle);
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Error fetching album',
+      };
+    }
+
+    return {
+      success: true,
+      data: album,
+    };
+  }
+
+  async getArtistsSuggestions(name: string): Promise<object> {
     const query = {
       name: { $regex: name, $options: 'i' },
     };
 
-    return this.artistModel.find(query).exec();
+    let artist = null;
+
+    try {
+      artist = await this.artistModel.find(query).exec();
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Error fetching artists',
+      };
+    }
+
+    return {
+      success: true,
+      data: artist,
+    };
   }
 
   async addArtist(request: Artist): Promise<object> {
-    const artist = await this.artistModel.create(request);
+    let artist = null;
+
+    try {
+      artist = await this.artistModel.create(request);
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Error adding artist',
+      };
+    }
 
     if (!artist) {
       return {
@@ -56,8 +133,24 @@ export class AppService {
   }
 
   async deleteArtist(id: string): Promise<object> {
-    const artistId = new mongoose.Types.ObjectId(id);
-    const response = await this.artistModel.findByIdAndDelete(artistId).exec();
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return {
+        success: false,
+        error: 'Invalid ID',
+      };
+    }
+
+    let response = null;
+
+    try {
+      const artistId = new mongoose.Types.ObjectId(id);
+      response = await this.artistModel.findByIdAndDelete(artistId).exec();
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Error deleting artist',
+      };
+    }
 
     if (!response) {
       return {
@@ -72,7 +165,25 @@ export class AppService {
   }
 
   async updateArtist(id: string, request: Artist): Promise<object> {
-    const artist = await this.artistModel.findByIdAndUpdate(id, request).exec();
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return {
+        success: false,
+        error: 'Invalid ID',
+      };
+    }
+    let artist = null;
+
+    try {
+      const artistId = new mongoose.Types.ObjectId(id);
+      artist = await this.artistModel
+        .findByIdAndUpdate(artistId, request)
+        .exec();
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Error updating artist',
+      };
+    }
 
     if (!artist) {
       return {
